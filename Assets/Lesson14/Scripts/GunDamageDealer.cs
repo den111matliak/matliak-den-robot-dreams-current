@@ -3,7 +3,7 @@ using Lesson14;
 using Shooting;
 using UnityEngine;
 
-namespace Dummies
+namespace Lesson14
 {
     public class GunDamageDealer : MonoBehaviour
     {

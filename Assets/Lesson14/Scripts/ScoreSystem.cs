@@ -12,8 +12,6 @@ namespace Lesson14
 
         [SerializeField] private HealthSystem _healthSystem;
         [SerializeField] private GunDamageDealer _gunDamageDealer;
-        [SerializeField] private GrenadeAction _grenadeAction;
-        [SerializeField] private GrenadeDamageDealer _grenadeDamageDealer;
 
         private Vector3Int _kda;
         private int _shotCount;
@@ -27,8 +25,6 @@ namespace Lesson14
             _gunDamageDealer.OnHit += HitHandler;
             _gunDamageDealer.Gun.OnShot += ShotHandler;
             _healthSystem.OnCharacterDeath += CharacterDeathHandler;
-            _grenadeAction.OnGrenadeSpawned += GrenadeSpawnHandler;
-            _grenadeDamageDealer.OnHit += HitHandler;
         }
 
         private void HitHandler(int hits)
@@ -49,10 +45,5 @@ namespace Lesson14
             OnDataUdpated?.Invoke();
         }
 
-        private void GrenadeSpawnHandler(Grenade grenade)
-        {
-            _shotCount++;
-            OnDataUdpated?.Invoke();
-        }
     }
 }

@@ -22,6 +22,12 @@ namespace Lesson14
 
         private void Start()
         {
+            Debug.Log($"Initial Health Value: {_health.HealthValue01}");
+            if (_referenceSize == Vector2.zero)
+            {
+                _referenceSize = new Vector2(1, 0.1f); // Default size
+                Debug.Log($"_referenceSize was zero, setting to: {_referenceSize}");
+            }
             ForceHealth(_health.HealthValue01);
             _health.OnHealthChanged01 += HealthChangedHandler;
         }
@@ -48,6 +54,7 @@ namespace Lesson14
 
             _healthValue.size = new Vector2(_referenceSize.x * _displayedHealth, _referenceSize.y);
             _damageValue.size = new Vector2(_referenceSize.x * _displayedDamage, _referenceSize.y);
+
         }
 
         private void HealthChangedHandler(float health) => SetHealth(health);

@@ -1592,6 +1592,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 019740f5e3ad74c14b671c93e0109fbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _healthSystem: {fileID: 0}
+  _gunDamageDealer: {fileID: 0}
 --- !u!4 &1919806257
 Transform:
   m_ObjectHideFlags: 0
@@ -2672,6 +2674,8 @@ GameObject:
   - component: {fileID: 9189269105061262731}
   - component: {fileID: 5272631324472850404}
   - component: {fileID: 9189269105061262732}
+  - component: {fileID: 9189269105061262734}
+  - component: {fileID: 9189269105061262733}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2810,6 +2814,44 @@ MonoBehaviour:
   _explosionRadius: 7
   _explosionForce: 3000
   _verticalOffset: 0
+--- !u!114 &9189269105061262733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6726818260401244974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1e2c5c171cb406c94e6388921fc756, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shotPrefab: {fileID: 0}
+  _muzzleTransform: {fileID: 734935828}
+  _decaySpeed: 50
+  _shotScale: {x: 1, y: 1, z: 1}
+  _shotRadius: 0.02
+  _shotVisualDiameter: 0.08
+  _tilingName: 
+  _range: 50
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 51
+--- !u!114 &9189269105061262734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6726818260401244974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28df3a68539f42f49120ab1c46889d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _healthSystem: {fileID: 1667991713}
+  _gun: {fileID: 9189269105061262733}
+  _damage: 35
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
