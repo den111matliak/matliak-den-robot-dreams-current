@@ -1,9 +1,14 @@
+using System;
 using System.Collections;
+using Lesson14;
+using Lesson8;
 using UnityEngine;
-using Lesson8; // Make sure this matches your namespace in InputController
 
 public class RaycastShoot : MonoBehaviour
 {
+    public event Action OnShot;
+    public event Action<Collider> OnHit; // ✅ Event for notifying hits
+
     public int gunDamage = 1;
     public float fireRate = 0.25f;
     public float weaponRange = 50f;
@@ -24,13 +29,11 @@ public class RaycastShoot : MonoBehaviour
         if (fpsCam == null)
             fpsCam = GetComponentInParent<Camera>();
 
-        // Subscribe to the InputController event for shooting
         InputController.OnPrimaryInput += FireWeapon;
     }
 
     void OnDestroy()
     {
-        // Unsubscribe to prevent memory leaks
         InputController.OnPrimaryInput -= FireWeapon;
     }
 
@@ -41,6 +44,9 @@ public class RaycastShoot : MonoBehaviour
         nextFire = Time.time + fireRate;
         StartCoroutine(ShotEffect());
 
+        // Fire shot event before checking hit
+        OnShot?.Invoke();  // 🔥 Notifies ScoreSystem that a shot happened!
+
         Vector3 rayOrigin = fpsCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
@@ -49,6 +55,20 @@ public class RaycastShoot : MonoBehaviour
         if (Physics.Raycast(rayOrigin, fpsCam.transform.forward, out hit, weaponRange))
         {
             laserLine.SetPosition(1, hit.point);
+
+            // ✅ Notify GunDamageDealer to apply damage
+            GunDamageDealer damageDealer = GetComponent<GunDamageDealer>();
+            if (damageDealer != null)
+            {
+                damageDealer.GunHitHandler(hit.collider);
+            }
+            else
+            {
+                Debug.LogError("❌ GunDamageDealer component not found on gun!");
+            }
+
+            // ✅ Notify any listeners that something was hit
+            OnHit?.Invoke(hit.collider);
         }
         else
         {

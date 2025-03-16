@@ -1,6 +1,4 @@
 using System;
-using Lesson14;
-using Shooting;
 using UnityEngine;
 
 namespace Lesson14
@@ -10,33 +8,27 @@ namespace Lesson14
         public event Action<int> OnHit;
 
         [SerializeField] private HealthSystem _healthSystem;
-        [SerializeField] private RaycastShoot _gun;
+        [SerializeField] private RaycastShoot _gun; // ✅ Use RaycastShoot instead of HitScanGun
         [SerializeField] private int _damage;
 
         public RaycastShoot Gun => _gun;
 
         private void Start()
         {
-            _gun.OnHit += GunHitHandler;
+            _gun.OnHit += GunHitHandler; // ✅ Subscribe to RaycastShoot's OnHit event
         }
 
-        private void GunHitHandler(Collider collider)
+        public void GunHitHandler(Collider collider)
         {
-            /*Health health = collider.GetComponent<Health>();
-            if (health != null)
-            {
-                health.TakeDamage(_damage);
-            }*/
             Health health = collider.GetComponent<Health>();
             if (health != null)
             {
                 health.TakeDamage(_damage);
                 Debug.Log($"✅ Raycast hit {collider.name}, applied {_damage} damage!");
-                OnHit?.Invoke(1);
             }
             else
             {
-                Debug.LogError($"No Health component found on {collider.name}");
+                Debug.Log($"⚠️ {collider.name} was hit, but it has no Health. Ignoring.");
             }
             OnHit?.Invoke(health ? 1 : 0);
         }
