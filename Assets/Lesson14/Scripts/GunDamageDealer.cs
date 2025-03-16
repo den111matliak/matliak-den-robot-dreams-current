@@ -10,10 +10,10 @@ namespace Lesson14
         public event Action<int> OnHit;
 
         [SerializeField] private HealthSystem _healthSystem;
-        [SerializeField] private HitScanGun _gun;
+        [SerializeField] private RaycastShoot _gun;
         [SerializeField] private int _damage;
 
-        public HitScanGun Gun => _gun;
+        public RaycastShoot Gun => _gun;
 
         private void Start()
         {
@@ -27,8 +27,17 @@ namespace Lesson14
             {
                 health.TakeDamage(_damage);
             }*/
-            if (_healthSystem.GetHealth(collider, out Health health))
+            Health health = collider.GetComponent<Health>();
+            if (health != null)
+            {
                 health.TakeDamage(_damage);
+                Debug.Log($"✅ Raycast hit {collider.name}, applied {_damage} damage!");
+                OnHit?.Invoke(1);
+            }
+            else
+            {
+                Debug.LogError($"No Health component found on {collider.name}");
+            }
             OnHit?.Invoke(health ? 1 : 0);
         }
     }
