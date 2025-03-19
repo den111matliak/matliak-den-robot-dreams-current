@@ -19,6 +19,7 @@ public class ExplosionController : MonoBehaviour
 
     public void Play()
     {
+        Debug.Log("🎆 Explosion Effect Played!");
         _sphere.Play(true);
     }
 }

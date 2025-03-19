@@ -56,8 +56,13 @@ namespace Lesson14
                 return;
 
             HealthValue = Mathf.Clamp(HealthValue - damage, 0, _maxHealth);
+            Debug.Log($"🔥 {gameObject.name} took {damage} damage! Current HP: {HealthValue}");
+
             if (HealthValue <= 0)
+            {
+                Debug.Log($"💀 {gameObject.name} has reached 0 HP and should die!");
                 IsAlive = false;
+            }
         }
 
         public void Heal(int heal)

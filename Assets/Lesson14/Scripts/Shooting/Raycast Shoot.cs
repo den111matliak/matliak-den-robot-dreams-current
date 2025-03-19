@@ -16,6 +16,8 @@ public class RaycastShoot : MonoBehaviour
     public Transform gunEnd;
     public Camera fpsCam;
 
+    [SerializeField] private GameObject hitMarkerPrefab; // ✅ Red dot hit effect
+
     private WaitForSeconds shotDuration = new WaitForSeconds(0.07f);
     private AudioSource gunAudio;
     private LineRenderer laserLine;
@@ -55,6 +57,13 @@ public class RaycastShoot : MonoBehaviour
         if (Physics.Raycast(rayOrigin, fpsCam.transform.forward, out hit, weaponRange))
         {
             laserLine.SetPosition(1, hit.point);
+
+            // ✅ Spawn red dot at the impact point
+            if (hitMarkerPrefab != null)
+            {
+                GameObject hitMarker = Instantiate(hitMarkerPrefab, hit.point + (hit.normal * 0.01f), Quaternion.LookRotation(hit.normal));
+                Destroy(hitMarker, 2f); // ✅ Auto-destroy after 2s
+            }
 
             // ✅ Notify GunDamageDealer to apply damage
             GunDamageDealer damageDealer = GetComponent<GunDamageDealer>();

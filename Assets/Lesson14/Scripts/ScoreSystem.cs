@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Lesson14;
 using Shooting;
 using UnityEngine;
 
@@ -24,7 +23,16 @@ namespace Lesson14
         {
             _gunDamageDealer.OnHit += HitHandler;
             _gunDamageDealer.Gun.OnShot += ShotHandler;
-            _healthSystem.OnCharacterDeath += CharacterDeathHandler;
+
+            if (_healthSystem != null)
+            {
+                _healthSystem.OnCharacterDeath += CharacterDeathHandler;
+                Debug.Log("✅ OnCharacterDeath event subscribed!");
+            }
+            else
+            {
+                Debug.LogError("❌ HealthSystem is missing in ScoreSystem!");
+            }
         }
 
         private void HitHandler(int hits)
@@ -41,9 +49,14 @@ namespace Lesson14
 
         private void CharacterDeathHandler(Health health)
         {
-            _kda.x++;
+            Debug.Log($"💀 Character {health.gameObject.name} died!");
+
+            _kda.x++; // ✅ Increase kills
+            Debug.Log($"💀 Kill counted! Total Kills: {_kda.x}");
+
             OnDataUdpated?.Invoke();
         }
+
 
     }
 }

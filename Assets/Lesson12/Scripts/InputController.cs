@@ -12,6 +12,7 @@ namespace Lesson8
         public static event Action OnPrimaryInput;
         public static event Action<bool> OnSecondaryInput;
         public static event Action OnGrenadeInput;
+        public static event Action<bool> OnScoreInput; // ✅ Event for showing/hiding score
 
         [SerializeField] private InputActionAsset _inputActionAsset;
         [SerializeField] private string _mapName;
@@ -21,6 +22,7 @@ namespace Lesson8
         [SerializeField] private string _primaryFireName;
         [SerializeField] private string _secondaryFireName;
         [SerializeField] private string _grenadeName;
+        [SerializeField] private string _scoreName; // ✅ Score input action
 
         private InputAction _moveAction;
         private InputAction _lookAroundAction;
@@ -28,6 +30,7 @@ namespace Lesson8
         private InputAction _primaryFireAction;
         private InputAction _secondaryFireAction;
         private InputAction _grenadeAction;
+        private InputAction _scoreAction; // ✅ Score input action reference
         private InputActionMap _actionMap;
 
         private bool _inputUpdated;
@@ -55,6 +58,7 @@ namespace Lesson8
             _primaryFireAction = _actionMap.FindAction(_primaryFireName);
             _secondaryFireAction = _actionMap.FindAction(_secondaryFireName);
             _grenadeAction = _actionMap.FindAction(_grenadeName);
+            _scoreAction = _actionMap.FindAction(_scoreName); // ✅ Find score action
 
             if (_moveAction == null || _lookAroundAction == null || _cameraLockAction == null ||
                 _primaryFireAction == null || _secondaryFireAction == null || _grenadeAction == null)
@@ -69,6 +73,7 @@ namespace Lesson8
             _primaryFireAction.Enable();
             _secondaryFireAction.Enable();
             _grenadeAction.Enable();
+            _scoreAction?.Enable(); // ✅ Enable score action
 
             _moveAction.performed += MovePerformedHandler;
             _moveAction.canceled += MoveCanceledHandler;
@@ -85,6 +90,12 @@ namespace Lesson8
             _secondaryFireAction.canceled += SecondaryFireCanceledHandler;
 
             _grenadeAction.performed += GrenadePerformedHandler;
+
+            if (_scoreAction != null)
+            {
+                _scoreAction.performed += ScorePerformedHandler;
+                _scoreAction.canceled += ScorePerformedHandler;
+            }
         }
 
         private void OnDisable()
@@ -128,11 +139,18 @@ namespace Lesson8
                 _grenadeAction.performed -= GrenadePerformedHandler;
             }
 
+            if (_scoreAction != null)
+            {
+                _scoreAction.performed -= ScorePerformedHandler;
+                _scoreAction.canceled -= ScorePerformedHandler;
+            }
+
             OnMoveInput = null;
             OnLookInput = null;
             OnPrimaryInput = null;
             OnSecondaryInput = null;
             OnGrenadeInput = null;
+            OnScoreInput = null; // ✅ Prevent memory leaks
         }
 
         private void MovePerformedHandler(InputAction.CallbackContext context)
@@ -167,9 +185,10 @@ namespace Lesson8
 
         private void PrimaryFirePerformedHandler(InputAction.CallbackContext context)
         {
+            Debug.Log($"🔫 PrimaryFirePerformedHandler() called at {Time.time}");
+
             OnPrimaryInput?.Invoke();
         }
-
         private void SecondaryFirePerformedHandler(InputAction.CallbackContext context)
         {
             OnSecondaryInput?.Invoke(true);
@@ -183,6 +202,12 @@ namespace Lesson8
         private void GrenadePerformedHandler(InputAction.CallbackContext context)
         {
             OnGrenadeInput?.Invoke();
+        }
+
+        private void ScorePerformedHandler(InputAction.CallbackContext context)
+        {
+            bool isPressed = context.ReadValue<float>() > 0; // ✅ Detect if Tab is pressed
+            OnScoreInput?.Invoke(isPressed);
         }
     }
 }
