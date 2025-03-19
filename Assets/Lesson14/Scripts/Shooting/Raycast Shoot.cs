@@ -41,6 +41,7 @@ public class RaycastShoot : MonoBehaviour
 
     private void FireWeapon()
     {
+        Debug.Log($"🚀 FireWeapon() called at {Time.time}");
         if (Time.time < nextFire) return; // Prevents shooting too fast
 
         nextFire = Time.time + fireRate;

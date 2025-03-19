@@ -87,7 +87,7 @@ namespace Lesson12
                     Health health = colliders[i].GetComponent<Health>();
                     if (health != null && !damagedObjects.Contains(health))
                     {
-                        health.TakeDamage(50);
+                        health.TakeDamage(50, "Explosion"); // ✅ Pass "Explosion" as the attacker
                         damagedObjects.Add(health);
                         Debug.Log($"🔥 Explosion applied 50 damage to {colliders[i].name}!");
                     }

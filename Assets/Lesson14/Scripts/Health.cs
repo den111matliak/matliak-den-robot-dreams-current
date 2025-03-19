@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Lesson14
@@ -14,6 +15,8 @@ namespace Lesson14
 
         protected int _health;
         protected bool _isAlive;
+
+        private List<string> damageSources = new List<string>(); // ✅ Track attackers for assists
 
         public int HealthValue
         {
@@ -50,20 +53,19 @@ namespace Lesson14
             SetHealth(MaxHealthValue);
         }
 
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, string attackerName)
         {
-            if (!IsAlive)
-                return;
+            if (!IsAlive) return; // ✅ Prevents damage from affecting already dead characters
 
             HealthValue = Mathf.Clamp(HealthValue - damage, 0, _maxHealth);
-            Debug.Log($"🔥 {gameObject.name} took {damage} damage! Current HP: {HealthValue}");
 
             if (HealthValue <= 0)
             {
-                Debug.Log($"💀 {gameObject.name} has reached 0 HP and should die!");
-                IsAlive = false;
+                Debug.Log($"💀 {gameObject.name} has 0 HP! Triggering death event...");
+                OnDeath?.Invoke(); // ✅ Triggers `CharacterDeathHandler()` BEFORE setting IsAlive
             }
         }
+
 
         public void Heal(int heal)
         {
@@ -77,6 +79,12 @@ namespace Lesson14
         {
             HealthValue = Mathf.Clamp(health, 0, _maxHealth);
             IsAlive = HealthValue > 0;
+        }
+
+        // ✅ Allow ScoreSystem to check who damaged this object
+        public List<string> GetDamageSources()
+        {
+            return new List<string>(damageSources);
         }
     }
 }

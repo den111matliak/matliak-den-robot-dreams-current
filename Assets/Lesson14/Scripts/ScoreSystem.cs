@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Shooting;
 using UnityEngine;
 
 namespace Lesson14
@@ -12,51 +10,110 @@ namespace Lesson14
         [SerializeField] private HealthSystem _healthSystem;
         [SerializeField] private GunDamageDealer _gunDamageDealer;
 
-        private Vector3Int _kda;
+        private Vector3Int _kda;  // Kills, Deaths, Assists (X = Kills, Y = Deaths, Z = Assists)
         private int _shotCount;
         private int _hitCount;
+        private int _headshotCount; // ✅ Tracks total headshots
+        private int _accuracy; // ✅ Stores accuracy percentage
 
         public Vector3Int KDA => _kda;
-        public int Accuracy => _shotCount == 0f ? 0 : (int)((_hitCount / (float)_shotCount) * 100f);
+        public int Accuracy => _accuracy;
+        public int Headshots => _headshotCount;
+
+        private void Awake()
+        {
+            if (_gunDamageDealer == null)
+            {
+                _gunDamageDealer = FindObjectOfType<GunDamageDealer>();
+                Debug.Log($"🔍 ScoreSystem: Auto-assigned GunDamageDealer -> {_gunDamageDealer}");
+            }
+
+            if (_healthSystem == null)
+            {
+                _healthSystem = FindObjectOfType<HealthSystem>();
+                Debug.Log($"🔍 ScoreSystem: Auto-assigned HealthSystem -> {_healthSystem}");
+            }
+        }
 
         private void Start()
         {
-            _gunDamageDealer.OnHit += HitHandler;
-            _gunDamageDealer.Gun.OnShot += ShotHandler;
-
-            if (_healthSystem != null)
+            if (_gunDamageDealer != null)
             {
-                _healthSystem.OnCharacterDeath += CharacterDeathHandler;
-                Debug.Log("✅ OnCharacterDeath event subscribed!");
+                _gunDamageDealer.OnHit -= HitHandler; // ✅ Prevent duplicate subscriptions
+                _gunDamageDealer.OnHit += HitHandler;
+                _gunDamageDealer.OnShot -= ShotHandler;
+                _gunDamageDealer.OnShot += ShotHandler;
+                Debug.Log("✅ ScoreSystem: Successfully subscribed to GunDamageDealer events.");
             }
             else
             {
-                Debug.LogError("❌ HealthSystem is missing in ScoreSystem!");
+                Debug.LogError("❌ ScoreSystem: GunDamageDealer is STILL NULL! Subscription failed.");
+            }
+
+            if (_healthSystem != null)
+            {
+                _healthSystem.OnCharacterDeath -= CharacterDeathHandler;
+                _healthSystem.OnCharacterDeath += CharacterDeathHandler;
+                Debug.Log("✅ ScoreSystem: Subscribed to HealthSystem events.");
+            }
+            else
+            {
+                Debug.LogError("❌ ScoreSystem: HealthSystem is STILL NULL! Subscription failed.");
             }
         }
 
-        private void HitHandler(int hits)
+        public void HitHandler(int hits, bool isHeadshot)
         {
             _hitCount += hits;
+
+            if (isHeadshot)
+                _headshotCount++;
+
+            UpdateAccuracy();
             OnDataUdpated?.Invoke();
         }
 
-        private void ShotHandler()
+        public void ShotHandler()
         {
-            _shotCount++;
+            _shotCount++; // ✅ Always count shots, even if they miss
+            Debug.Log($"🔫 Shot fired! Total shots: {_shotCount}");
+            UpdateAccuracy();
             OnDataUdpated?.Invoke();
         }
 
-        private void CharacterDeathHandler(Health health)
-        {
-            Debug.Log($"💀 Character {health.gameObject.name} died!");
 
-            _kda.x++; // ✅ Increase kills
+        public void CharacterDeathHandler(Health health)
+        {
+            if (health == null)
+            {
+                Debug.LogError("❌ CharacterDeathHandler: Health is NULL!");
+                return;
+            }
+
+            if (!health.IsAlive)
+            {
+                Debug.Log($"⚠️ {health.gameObject.name} is already dead. Skipping kill count.");
+                return;
+            }
+
+            Debug.Log($"💀 {health.gameObject.name} died! Counting kill...");
+
+            _kda.x++; // ✅ Increase kill count BEFORE setting IsAlive to false
             Debug.Log($"💀 Kill counted! Total Kills: {_kda.x}");
 
             OnDataUdpated?.Invoke();
+            health.IsAlive = false; // ✅ Set IsAlive AFTER counting the kill
         }
 
+
+
+
+
+        private void UpdateAccuracy()
+        {
+            _accuracy = _shotCount == 0 ? 0 : (int)((_hitCount / (float)_shotCount) * 100f);
+            Debug.Log($"🎯 Accuracy Updated: {_accuracy}%");
+        }
 
     }
 }
