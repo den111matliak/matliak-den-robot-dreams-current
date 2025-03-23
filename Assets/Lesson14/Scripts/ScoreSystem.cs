@@ -24,43 +24,25 @@ namespace Lesson14
         {
             if (_gunDamageDealer == null)
             {
-                _gunDamageDealer = FindObjectOfType<GunDamageDealer>();
-                Debug.Log($"🔍 ScoreSystem: Auto-assigned GunDamageDealer -> {_gunDamageDealer}");
+                Debug.LogError("❌ ScoreSystem: GunDamageDealer not assigned in Inspector!");
             }
 
             if (_healthSystem == null)
             {
-                _healthSystem = FindObjectOfType<HealthSystem>();
-                Debug.Log($"🔍 ScoreSystem: Auto-assigned HealthSystem -> {_healthSystem}");
+                Debug.LogError("❌ ScoreSystem: HealthSystem not assigned in Inspector!");
             }
         }
 
         private void Start()
         {
-            if (_gunDamageDealer != null)
-            {
-                _gunDamageDealer.OnHit -= HitHandler; // ✅ Prevent duplicate subscriptions
-                _gunDamageDealer.OnHit += HitHandler;
-                _gunDamageDealer.OnShot -= ShotHandler;
-                _gunDamageDealer.OnShot += ShotHandler;
-                Debug.Log("✅ ScoreSystem: Successfully subscribed to GunDamageDealer events.");
-            }
-            else
-            {
-                Debug.LogError("❌ ScoreSystem: GunDamageDealer is STILL NULL! Subscription failed.");
-            }
+            _gunDamageDealer.OnHit += HitHandler;
+            _gunDamageDealer.OnShot += ShotHandler;
+            Debug.Log("✅ ScoreSystem: Subscribed to GunDamageDealer events.");
 
-            if (_healthSystem != null)
-            {
-                _healthSystem.OnCharacterDeath -= CharacterDeathHandler;
-                _healthSystem.OnCharacterDeath += CharacterDeathHandler;
-                Debug.Log("✅ ScoreSystem: Subscribed to HealthSystem events.");
-            }
-            else
-            {
-                Debug.LogError("❌ ScoreSystem: HealthSystem is STILL NULL! Subscription failed.");
-            }
+            _healthSystem.OnCharacterDeath += CharacterDeathHandler;
+            Debug.Log("✅ ScoreSystem: Subscribed to HealthSystem events.");
         }
+
 
         public void HitHandler(int hits, bool isHeadshot)
         {

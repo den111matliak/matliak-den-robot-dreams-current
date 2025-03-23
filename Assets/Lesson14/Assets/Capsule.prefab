@@ -672,6 +672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterController: {fileID: 9015059948567171207}
   _maxHealth: 100
+  _weakPointCollider: {fileID: 4077106821593987261}
 --- !u!114 &8458813645045280434
 MonoBehaviour:
   m_ObjectHideFlags: 0

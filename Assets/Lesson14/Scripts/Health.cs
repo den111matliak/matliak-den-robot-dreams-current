@@ -13,18 +13,19 @@ namespace Lesson14
         [SerializeField] protected CharacterController _characterController;
         [SerializeField] protected int _maxHealth;
 
+        [SerializeField] private Collider _weakPointCollider; // ✅ Reference to head collider
+
         protected int _health;
         protected bool _isAlive;
 
-        private List<string> damageSources = new List<string>(); // ✅ Track attackers for assists
+        private List<string> damageSources = new List<string>();
 
         public int HealthValue
         {
             get => _health;
             set
             {
-                if (_health == value)
-                    return;
+                if (_health == value) return;
                 _health = value;
                 OnHealthChanged?.Invoke(_health);
                 OnHealthChanged01?.Invoke(_health / (float)_maxHealth);
@@ -36,11 +37,9 @@ namespace Lesson14
             get => _isAlive;
             set
             {
-                if (_isAlive == value)
-                    return;
+                if (_isAlive == value) return;
                 _isAlive = value;
-                if (!_isAlive)
-                    OnDeath?.Invoke();
+                if (!_isAlive) OnDeath?.Invoke();
             }
         }
 
@@ -55,23 +54,23 @@ namespace Lesson14
 
         public void TakeDamage(int damage, string attackerName)
         {
-            if (!IsAlive) return; // ✅ Prevents damage from affecting already dead characters
+            if (!IsAlive) return;
 
             HealthValue = Mathf.Clamp(HealthValue - damage, 0, _maxHealth);
 
             if (HealthValue <= 0)
             {
                 Debug.Log($"💀 {gameObject.name} has 0 HP! Triggering death event...");
-                OnDeath?.Invoke(); // ✅ Triggers `CharacterDeathHandler()` BEFORE setting IsAlive
+                OnDeath?.Invoke();
             }
-        }
 
+            if (!damageSources.Contains(attackerName))
+                damageSources.Add(attackerName);
+        }
 
         public void Heal(int heal)
         {
-            if (!IsAlive)
-                return;
-
+            if (!IsAlive) return;
             HealthValue = Mathf.Clamp(HealthValue + heal, 0, _maxHealth);
         }
 
@@ -81,10 +80,15 @@ namespace Lesson14
             IsAlive = HealthValue > 0;
         }
 
-        // ✅ Allow ScoreSystem to check who damaged this object
         public List<string> GetDamageSources()
         {
             return new List<string>(damageSources);
+        }
+
+        // ✅ New method to check for weak point (e.g. head)
+        public bool IsColliderAWeakPoint(Collider hitCollider)
+        {
+            return _weakPointCollider != null && hitCollider == _weakPointCollider;
         }
     }
 }
