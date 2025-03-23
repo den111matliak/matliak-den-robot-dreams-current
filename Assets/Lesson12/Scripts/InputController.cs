@@ -13,6 +13,7 @@ namespace Lesson8
         public static event Action<bool> OnSecondaryInput;
         public static event Action OnGrenadeInput;
         public static event Action<bool> OnScoreInput; // ✅ Event for showing/hiding score
+        public static event Action OnEscape;
 
         [SerializeField] private InputActionAsset _inputActionAsset;
         [SerializeField] private string _mapName;
@@ -23,6 +24,7 @@ namespace Lesson8
         [SerializeField] private string _secondaryFireName;
         [SerializeField] private string _grenadeName;
         [SerializeField] private string _scoreName; // ✅ Score input action
+        [SerializeField] private string _escapeName;
 
         private InputAction _moveAction;
         private InputAction _lookAroundAction;
@@ -31,6 +33,7 @@ namespace Lesson8
         private InputAction _secondaryFireAction;
         private InputAction _grenadeAction;
         private InputAction _scoreAction; // ✅ Score input action reference
+        private InputAction _escapeAction;
         private InputActionMap _actionMap;
 
         private bool _inputUpdated;
@@ -59,6 +62,7 @@ namespace Lesson8
             _secondaryFireAction = _actionMap.FindAction(_secondaryFireName);
             _grenadeAction = _actionMap.FindAction(_grenadeName);
             _scoreAction = _actionMap.FindAction(_scoreName); // ✅ Find score action
+            _escapeAction = _actionMap.FindAction(_escapeName);
 
             if (_moveAction == null || _lookAroundAction == null || _cameraLockAction == null ||
                 _primaryFireAction == null || _secondaryFireAction == null || _grenadeAction == null)
@@ -90,6 +94,7 @@ namespace Lesson8
             _secondaryFireAction.canceled += SecondaryFireCanceledHandler;
 
             _grenadeAction.performed += GrenadePerformedHandler;
+            _escapeAction.performed += EscapePerformedHandler;
 
             if (_scoreAction != null)
             {
@@ -145,6 +150,8 @@ namespace Lesson8
                 _scoreAction.canceled -= ScorePerformedHandler;
             }
 
+            _escapeAction.performed -= EscapePerformedHandler;
+
             OnMoveInput = null;
             OnLookInput = null;
             OnPrimaryInput = null;
@@ -186,9 +193,9 @@ namespace Lesson8
         private void PrimaryFirePerformedHandler(InputAction.CallbackContext context)
         {
             Debug.Log($"🔫 PrimaryFirePerformedHandler() called at {Time.time}");
-
             OnPrimaryInput?.Invoke();
         }
+
         private void SecondaryFirePerformedHandler(InputAction.CallbackContext context)
         {
             OnSecondaryInput?.Invoke(true);
@@ -208,6 +215,11 @@ namespace Lesson8
         {
             bool isPressed = context.ReadValue<float>() > 0; // ✅ Detect if Tab is pressed
             OnScoreInput?.Invoke(isPressed);
+        }
+
+        private void EscapePerformedHandler(InputAction.CallbackContext context)
+        {
+            OnEscape?.Invoke();
         }
     }
 }
